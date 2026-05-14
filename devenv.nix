@@ -10,7 +10,8 @@
     python313Packages.numpy
     python313Packages.pandas
     python313Packages.flask
-    python313Packages.cors
+    python313Packages.flask-cors
+    python313Packages.gunicorn
   ];
 
   languages.python.enable = true;
