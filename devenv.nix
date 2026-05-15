@@ -12,6 +12,7 @@
     python313Packages.flask
     python313Packages.flask-cors
     python313Packages.gunicorn
+    python313Packages.tensorflow
   ];
 
   languages.python.enable = true;

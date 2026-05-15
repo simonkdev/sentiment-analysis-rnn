@@ -11,7 +11,7 @@ def forward_pass_one_input(X, W_1, W_2, W_3, W_4, W_out, B_1, B_2, B_3, B_4, B_o
     """
     W_hh = 0
     for layer_index in range(len(X)):
-        W_t = np.array(X[layer_index], W_hh)
+        W_t = np.array(X[layer_index], W_hh)                        # W_hh is used as a feature without a weight in an attempt to avoid the vanishing/exploding gradient problem
         A_1 = forward_pass_one_layer_hidden(W_t, W_1, B_1)
         Z_1 = relu(A_1) # shape: [1, neurons_first_layer]
         A_2 = forward_pass_one_layer_hidden(Z_1, W_2, B_2)
