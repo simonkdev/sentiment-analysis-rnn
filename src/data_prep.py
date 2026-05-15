@@ -3,11 +3,17 @@
 
 import pandas as pd
 import numpy as np
-from tensorflow.keras.preprocessing.text import Tokenizer
+from keras.preprocessing.text import Tokenizer
 
 def data_tokenization(dataframe):
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(dataframe['text'])
     sequences = tokenizer.texts_to_sequences(dataframe['text'])
     return sequences
+
+def load_data(file_path):
+    df = pd.read_csv(file_path)
+    sequences = data_tokenization(df)
+    labels = pd.get_dummies(df['label']).values
+    return sequences, labels
 
