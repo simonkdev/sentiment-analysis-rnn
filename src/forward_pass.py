@@ -9,24 +9,25 @@ def forward_pass_one_input(X, W_1, W_2, W_3, W_4, W_out, B_1, B_2, B_3, B_4, B_o
     :param W_t: weight matrix for layer t, shape: [neurons_in_previous_layer, 2]    
     :param B_t: bias matrix for layer t, shape: [neuron_layer_t, 1]
     """
-    W_hh = 0
-    for layer_index in range(len(X)):
-        W_t = np.array(X[layer_index], W_hh)                       
-        A_1 = forward_pass_one_layer_hidden(W_t, W_1, B_1)
-        Z_1 = relu(A_1) # shape: [1, neurons_first_layer]
-        A_2 = forward_pass_one_layer_hidden(Z_1, W_2, B_2)
-        Z_2 = relu(A_2) # shape: [1, neurons_second_layer]
-        A_3 = forward_pass_one_layer_hidden(Z_2, W_3, B_3)
-        Z_3 = relu(A_3) # shape: [1, neurons_third_layer]
-        A_4 = forward_pass_one_layer_hidden(Z_3, W_4, B_4)
-        Z_4 = relu(A_4) # shape: [1, neurons_fourth_layer]
-        if layer_index == len(X) - 1:
-                A_out = forward_pass_one_input(Z_4, W_out, B_out)
-                output = softmax(A_out)
+    index = 0
+    W_hh = np.zeros((1, 5)) # initialize W_hh as an empty arrays
+    for x_t in X:
+        x_t = np.array([[x_t]])
+        print(f"x_t: {x_t.shape}"
+              f"\nW_hh: {W_hh.shape}")
+        x_h = np.hstack((x_t, W_hh)) # shape: [1, 2]
+        print(f"x_h: {x_h.shape}")
+        Z_1 = forward_pass_one_layer_hidden(x_h, W_1, B_1)
+        Z_2 = forward_pass_one_layer_hidden(Z_1, W_2, B_2)
+        Z_3 = forward_pass_one_layer_hidden(Z_2, W_3, B_3)
+        Z_4 = forward_pass_one_layer_hidden(Z_3, W_4, B_4)
+        if index == len(X) - 1:
+                output = forward_pass_one_layer_hidden(Z_4, W_out, B_out, output_layer=True)
                 return output
         W_hh = Z_4
+        index += 1
             
-def forward_pass_one_layer_hidden(X_n, W_n, B):
+def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False):
     """
     Performs fwd pass for one hidden layer. 
 
@@ -34,6 +35,9 @@ def forward_pass_one_layer_hidden(X_n, W_n, B):
     :param W_n: matrix of weights for the n-th layer (1 row per neuron: (shape: [neurons_per_layer, 2]))
     :param B: vector of biases for the n-th layer (shape: [neurons_per_layer, 1])
     """
-    A_n = np.dot(W_n, X_n.T) + B
-    Z_n = relu(A_n)
-    return Z_n.T # shape: 1, neurons_layer_n
+    A_n = np.dot(X_n, W_n.T) + B.T
+    if not output_layer: 
+        Z_n = relu(A_n) 
+    else: 
+        Z_n = softmax(A_n)
+    return Z_n # shape: 1, neurons_layer_n

@@ -3,7 +3,7 @@
 
 import pandas as pd
 import numpy as np
-from keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 def data_tokenization(dataframe):
     tokenizer = Tokenizer()

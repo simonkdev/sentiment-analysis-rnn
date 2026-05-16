@@ -7,5 +7,5 @@ def softmax(x):
 
 def relu(x):
     """Rectified Linear Unit (ReLU) activation function."""
-    return max(0, x)
+    return np.maximum(0, x)
 
