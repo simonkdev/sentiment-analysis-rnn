@@ -10,3 +10,4 @@ devenv.local.yaml
 .pre-commit-config.yaml
 
 __pycache__*
+__pycache__/main_rnn.cpython-313.pyc
