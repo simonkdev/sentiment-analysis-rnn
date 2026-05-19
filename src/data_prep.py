@@ -12,6 +12,10 @@ def data_tokenization(dataframe):
     tokenizer.fit_on_texts(dataframe['text'])
     print("[ INIT ] Text data tokenized.")
     sequences = tokenizer.texts_to_sequences(dataframe['text'])
+
+    max_token = max(max(seq) for seq in sequences) if sequences else 1
+    sequences = [[t / max_token for t in seq] for seq in sequences]
+    
     return sequences
 
 def load_data(file_path):
