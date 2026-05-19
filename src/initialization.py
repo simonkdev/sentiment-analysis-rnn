@@ -12,12 +12,12 @@ def initialize_weights(neurons_hidden, output_neurons):
     """
     print("[ INIT ] Initializing weights...")
     W_1 = np.random.normal(0, 1, (neurons_hidden, 6)) # 6 = 1 (input) + 5 (hidden state)
-    W_2 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
-    W_3 = np.random.normal(0, 1, (neurons_hidden,  neurons_hidden))
-    W_4 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
+    # W_2 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
+    # W_3 = np.random.normal(0, 1, (neurons_hidden,  neurons_hidden))
+    # W_4 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
     W_out = np.random.normal(0, 1, (output_neurons, neurons_hidden))
     print("[ INIT ] Weights initialized.")
-    return W_1, W_2, W_3, W_4, W_out
+    return W_1, W_out
 
 def initialize_biases(neurons_hidden, output_neurons):
     """
@@ -30,9 +30,9 @@ def initialize_biases(neurons_hidden, output_neurons):
     """
     print("[ INIT ] Initializing biases...")
     B_1 = np.random.normal(0, 1, (neurons_hidden, 1))
-    B_2 = np.random.normal(0, 1, (neurons_hidden, 1))
-    B_3 = np.random.normal(0, 1, (neurons_hidden, 1))
-    B_4 = np.random.normal(0, 1, (neurons_hidden, 1))
+    # B_2 = np.random.normal(0, 1, (neurons_hidden, 1))
+    # B_3 = np.random.normal(0, 1, (neurons_hidden, 1))
+    # B_4 = np.random.normal(0, 1, (neurons_hidden, 1))
     B_out = np.random.normal(0, 1, (output_neurons, 1))
     print("[ INIT ] Biases initialized.")
-    return B_1, B_2, B_3, B_4, B_out
+    return B_1, B_out
