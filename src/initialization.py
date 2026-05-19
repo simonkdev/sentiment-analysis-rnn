@@ -11,13 +11,20 @@ def initialize_weights(neurons_hidden, output_neurons):
     :return: weight matrices for each layer
     """
     print("[ INIT ] Initializing weights...")
-    W_1 = np.random.normal(0, 1, (neurons_hidden, 6)) # 6 = 1 (input) + 5 (hidden state)
+
+    scale = np.sqrt(2.0 / (6 + neurons_hidden))  # fan_in + fan_out
+    W_1 = np.random.normal(0, scale, (neurons_hidden, 6))
+    W_out = np.random.normal(0, scale, (output_neurons, neurons_hidden))
+
+
+    #W_1 = np.random.normal(0, 1, (neurons_hidden, 6)) # 6 = 1 (input) + 5 (hidden state)
     # W_2 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
     # W_3 = np.random.normal(0, 1, (neurons_hidden,  neurons_hidden))
     # W_4 = np.random.normal(0, 1, (neurons_hidden, neurons_hidden))
-    W_out = np.random.normal(0, 1, (output_neurons, neurons_hidden))
+    #W_out = np.random.normal(0, 1, (output_neurons, neurons_hidden))
     print("[ INIT ] Weights initialized.")
     return W_1, W_out
+
 
 def initialize_biases(neurons_hidden, output_neurons):
     """
