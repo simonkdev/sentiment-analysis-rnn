@@ -1,4 +1,4 @@
-from src.activation import relu, softmax
+from src.activation import tanh, softmax
 import numpy as np
 import tqdm as tqdm
 
@@ -38,7 +38,7 @@ def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivatio
     """
     A_n = np.dot(X_n, W_n.T) + B.T
     if not output_layer: 
-        Z_n = relu(A_n) 
+        Z_n = tanh(A_n) 
     else: 
         Z_n = softmax(A_n)
     if passActivations:

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import tqdm as tqdm
 
-from src.activation import relu, softmax, relu_derivative, softmax_derivative
+from src.activation import tanh, softmax, tanh_derivative, softmax_derivative
 from src.forward_pass import forward_pass_input_vector
 
 class Backprop:
@@ -27,15 +27,15 @@ class Backprop:
         dW_out = np.dot(activation5.T, delta)
         dB_out = np.sum(delta, axis=0, keepdims=True)
 
-        delta_hidden = np.dot(delta, self.W_out) * relu_derivative(activation1.reshape(-1, 5))
+        delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(activation1.reshape(-1, 5))
         # dW_4 = dW_out.dot(self.W_out)
-        # dB_4 = dW_4 * relu_derivative(activation4)
+        # dB_4 = dW_4 * tanh_derivative(activation4)
 
         # dW_3 = dW_4.dot(self.W_4)
-        # dB_3 = dW_3 * relu_derivative(activation3)
+        # dB_3 = dW_3 * tanh_derivative(activation3)
 
         # dW_2 = dW_3.dot(self.W_3)
-        # dB_2 = dW_2 * relu_derivative(activation2)
+        # dB_2 = dW_2 * tanh_derivative(activation2)
 
         dW_1 = delta_hidden.T.dot(x_h_last)
         dB_1 = np.sum(delta_hidden, axis=0, keepdims=True).T

@@ -22,7 +22,7 @@ def load_data(file_path):
     print(f"[ INIT ] Loading data from {file_path}...")
     df = pd.read_csv(file_path)
     sequences = data_tokenization(df)
-    labels = pd.get_dummies(df['label'], drop_first=True, dtype=int).values
+    labels = pd.get_dummies(df['label'], drop_first=False, dtype=int).values
     print(f"[ INIT ] Data loaded from {file_path}.")
     print(labels)
     return sequences, labels

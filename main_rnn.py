@@ -4,7 +4,7 @@ from src.data_prep import load_data
 from src.backprop import Backprop
 
 NEURONS_LAYER_HIDDEN = 5
-OUTPUT_NEURONS = 1
+OUTPUT_NEURONS = 2
 
 W_1, W_out = initialize_weights(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
 B_1, B_out = initialize_biases(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)

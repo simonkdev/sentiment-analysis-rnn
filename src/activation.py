@@ -5,11 +5,11 @@ def softmax(x):
     e_x = np.exp(x - np.max(x))  # Subtract max for numerical stability
     return e_x / (e_x.sum(axis=0)+ 0.0000000000000000001)  # Normalize
 
-def relu(x):
-    """Rectified Linear Unit (ReLU) activation function."""
-    return np.maximum(0, x)
+def tanh(x):
+    """Rectified Linear Unit (tanh) activation function."""
+    return np.tanh(x)
 
-def relu_derivative(x):
+def tanh_derivative(x):
     return (x > 0).astype(x.dtype)
 
 def softmax_derivative(s):
