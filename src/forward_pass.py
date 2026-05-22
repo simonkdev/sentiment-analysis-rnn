@@ -57,6 +57,5 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
         a5_list.append(a5.flatten())
         x_h_list.append(x_h.flatten())
     if passActivations:
-        print(f"x_h_list shape: {np.array(x_h_list).shape}")
         return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(z1_list), np.array(a5_list), np.array(x_h_list)
     return np.array(out_list).reshape(X.shape[0], -1)

@@ -17,14 +17,16 @@ class Backprop:
         predictions, hidden_outputs, hidden_pre_activation, output_pre_activation, x_h_last = forward_pass_input_vector(X, self.W_1, self.W_out, self.B_1, self.B_out, passActivations=True)
         
         delta = predictions - Y_true
-        
-        dW_out = np.dot(delta.T, hidden_outputs)
-        dB_out = np.sum(delta, axis=0, keepdims=True).T
+
+        batch_size = len(X)
+
+        dW_out = np.dot(delta.T, hidden_outputs) / batch_size
+        dB_out = np.sum(delta, axis=0, keepdims=True).T / batch_size
 
         delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(hidden_pre_activation.reshape(-1, 5))
 
-        dW_1 = delta_hidden.T.dot(x_h_last)
-        dB_1 = np.sum(delta_hidden, axis=0, keepdims=True).T
+        dW_1 = delta_hidden.T.dot(x_h_last) / batch_size
+        dB_1 = np.sum(delta_hidden, axis=0, keepdims=True).T / batch_size
 
         if passPredictions:
             return dW_1, dB_1, dW_out, dB_out, predictions
@@ -45,8 +47,7 @@ class Backprop:
         loss_history = []
         for epoch in tqdm.tqdm(range(epochs)):
             predictions = self.training_step(X_train, Y_train, passPredictions=True)
-            if epoch % 10 == 0:
-                loss = np.mean((predictions - Y_train) ** 2)
-                loss_history.append(loss)
-                print(f"Epoch {epoch}, Loss: {loss}")
+            loss = -np.mean(Y_train * np.log(predictions + 1e-18))
+            loss_history.append(loss)
+            print(f"Epoch {epoch}, Loss: {loss}")
         return loss_history
