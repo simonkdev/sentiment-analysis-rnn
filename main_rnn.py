@@ -17,8 +17,10 @@ sequences, labels, max_token, tokenizer = load_data("data/IMDB Dataset.csv")
 print(sequences[0])
 
 
-def classify_sentiment(string, max_token, tokenizer):
-    sequence = process_new_data(string, max_token, tokenizer)
+def classify_sentiment(text, max_token, tokenizer):
+    sequence = tokenizer.texts_to_sequences([text])[0]
+    sequence = [t / max_token for t in sequence]  # Normalize
+    sequence = np.array(sequence).flatten()  # Ensure 1D
     label = forward_pass_one_input(sequence, W_1, W_out, B_1, B_out)
     return np.argmax(label)
 
