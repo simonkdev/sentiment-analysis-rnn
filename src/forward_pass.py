@@ -1,5 +1,6 @@
 from src.activation import relu, softmax
 import numpy as np
+import tqdm as tqdm
 
 def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     """
@@ -21,7 +22,8 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
         if index == len(X) - 1:
                 output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
                 if passActivations:
-                    return output, A_1, A_5
+                    #print(f"x_h shape: {x_h.shape}")
+                    return output, A_1, A_5, x_h
                 return output
         W_hh = Z_1
         index += 1
@@ -51,16 +53,17 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     # a3_list = []
     # a4_list = []
     a5_list = []
-    x_h_last = np.zeros((1, 6)) # initialize x_h_last as an empty array
-    for x in X_list:
-        out, a1, a5 = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
+    x_h_list = []
+    for x in tqdm.tqdm(X_list):
+        out, a1, a5, x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
         out_list.append(out)
         a1_list.append(a1)
         # a2_list.append(a2)
         # a3_list.append(a3)
         # a4_list.append(a4)
-        a5_list.append(a5)
-        x_h_last = x
+        a5_list.append(a5.flatten())
+        x_h_list.append(x_h.flatten())
     if passActivations:
-        return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(a5_list), x_h_last
+        print(f"x_h_list shape: {np.array(x_h_list).shape}")
+        return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(a5_list), np.array(x_h_list)
     return np.array(out_list).reshape(X.shape[0], -1)

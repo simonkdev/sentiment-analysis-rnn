@@ -13,6 +13,7 @@
     python313Packages.flask-cors
     python313Packages.gunicorn
     python313Packages.keras
+    python313Packages.tqdm
   ];
 
   languages.python.enable = true;
