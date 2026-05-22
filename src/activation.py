@@ -1,9 +1,9 @@
 import numpy as np
 
 def softmax(x):
-    """Compute softmax values for each set of scores in x."""
-    e_x = np.exp(x - np.max(x))  # Subtract max for numerical stability
-    return e_x / (e_x.sum(axis=0)+ 0.0000000000000000001)  # Normalize
+    """Compute softmax values for each row independently."""
+    e_x = np.exp(x - np.max(x, axis=1, keepdims=True))  # Max along rows
+    return e_x / (e_x.sum(axis=1, keepdims=True) + 1e-18)  # Sum along rows
 
 def tanh(x):
     """Rectified Linear Unit (tanh) activation function."""
