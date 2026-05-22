@@ -6,7 +6,7 @@ from src.activation import tanh_derivative
 from src.forward_pass import forward_pass_input_vector
 
 class Backprop:
-    def __init__(self, W_1, W_out, B_1, B_out, learning_rate=0.001):
+    def __init__(self, W_1, W_out, B_1, B_out, learning_rate=0.06):
         self.W_1 = W_1
         self.W_out = W_out
         self.B_1 = B_1

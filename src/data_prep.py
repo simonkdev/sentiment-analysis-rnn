@@ -13,14 +13,19 @@ def data_tokenization(dataframe):
     max_token = max(max(seq) for seq in sequences) if sequences else 1
     sequences = [[t / max_token for t in seq] for seq in sequences]
     
-    return sequences
+    return sequences, max_token, tokenizer
 
 def load_data(file_path):
     print(f"[ INIT ] Loading data from {file_path}...")
     df = pd.read_csv(file_path)
-    sequences = data_tokenization(df)
+    sequences, max_token, tokenizer = data_tokenization(df)
     labels = pd.get_dummies(df['label'], dtype=int).values
     print(f"[ INIT ] Data loaded from {file_path}.")
     print(labels)
-    return sequences, labels
+    return sequences, labels, max_token, tokenizer
+
+def process_new_data(string, max_token, tokenizer):
+    sequence = np.array(tokenizer.texts_to_sequences([string]))
+    sequence = [t / max_token for t in sequence]
+    return sequence
 
