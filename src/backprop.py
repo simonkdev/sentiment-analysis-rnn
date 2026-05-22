@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import tqdm as tqdm
 
-from src.activation import tanh, softmax, tanh_derivative, softmax_derivative
+from src.activation import tanh_derivative
 from src.forward_pass import forward_pass_input_vector
 
 class Backprop:
@@ -19,7 +19,7 @@ class Backprop:
         delta = predictions - Y_true
         
         dW_out = np.dot(delta.T, hidden_outputs)
-        dB_out = np.sum(delta, axis=0, keepdims=True)
+        dB_out = np.sum(delta, axis=0, keepdims=True).T
 
         delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(hidden_pre_activation.reshape(-1, 5))
 

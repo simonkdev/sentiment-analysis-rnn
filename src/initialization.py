@@ -36,10 +36,10 @@ def initialize_biases(neurons_hidden, output_neurons):
     :return: bias vectors for each layer
     """
     print("[ INIT ] Initializing biases...")
-    B_1 = np.random.normal(0, 1, (neurons_hidden, output_neurons ))
+    B_1 = np.random.normal(0, 1, (neurons_hidden, 1 ))
     # B_2 = np.random.normal(0, 1, (neurons_hidden, 1))
     # B_3 = np.random.normal(0, 1, (neurons_hidden, 1))
     # B_4 = np.random.normal(0, 1, (neurons_hidden, 1))
-    B_out = np.random.normal(0, 1, (output_neurons, output_neurons))
+    B_out = np.random.normal(0, 1, (output_neurons, 1))
     print("[ INIT ] Biases initialized.")
     return B_1, B_out
