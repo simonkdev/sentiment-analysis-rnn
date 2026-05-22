@@ -17,10 +17,4 @@
   ];
 
   languages.python.enable = true;
-
-  # https://devenv.sh/tasks/
-  # tasks = {
-  #   "myproj:setup".exec = "mytool build";
-  #   "devenv:enterShell".after = [ "myproj:setup" ];
-  # };
 }

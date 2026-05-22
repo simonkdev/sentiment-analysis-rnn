@@ -16,14 +16,11 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
         x_t = np.array([[x_t]])
         x_h = np.hstack((x_t, W_hh)) # shape: [1, 2]
         Z_1, A_1 = forward_pass_one_layer_hidden(x_h, W_1, B_1, passActivations=True)
-        # Z_2, A_2 = forward_pass_one_layer_hidden(Z_1, W_2, B_2, passActivations=True)
-        # Z_3, A_3 = forward_pass_one_layer_hidden(Z_2, W_3, B_3, passActivations=True)
-        # Z_4, A_4 = forward_pass_one_layer_hidden(Z_3, W_4, B_4, passActivations=True)
         if index == len(X) - 1:
                 output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
                 if passActivations:
                     #print(f"x_h shape: {x_h.shape}")
-                    return output, A_1, A_5, x_h
+                    return output, Z_1, A_1, A_5, x_h
                 return output
         W_hh = Z_1
         index += 1
@@ -48,22 +45,18 @@ def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivatio
 def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     X_list = X #.tolist()
     out_list = []
+    z1_list = []
     a1_list = []
-    # a2_list = []
-    # a3_list = []
-    # a4_list = []
     a5_list = []
     x_h_list = []
     for x in tqdm.tqdm(X_list):
-        out, a1, a5, x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
+        out, z1, a1, a5, x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
         out_list.append(out)
-        a1_list.append(a1)
-        # a2_list.append(a2)
-        # a3_list.append(a3)
-        # a4_list.append(a4)
+        a1_list.append(a1.flatten())
+        z1_list.append(z1.flatten())
         a5_list.append(a5.flatten())
         x_h_list.append(x_h.flatten())
     if passActivations:
         print(f"x_h_list shape: {np.array(x_h_list).shape}")
-        return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(a5_list), np.array(x_h_list)
+        return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(z1_list), np.array(a5_list), np.array(x_h_list)
     return np.array(out_list).reshape(X.shape[0], -1)

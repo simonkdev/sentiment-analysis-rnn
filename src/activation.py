@@ -10,7 +10,7 @@ def tanh(x):
     return np.tanh(x)
 
 def tanh_derivative(x):
-    return (x > 0).astype(x.dtype)
+    return 1 - np.tanh(x)**2
 
 def softmax_derivative(s):
     """
