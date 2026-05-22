@@ -51,3 +51,9 @@ class Backprop:
             loss_history.append(loss)
             print(f"Epoch {epoch}, Loss: {loss}")
         return loss_history
+    
+    def save_state(self):
+        np.save("params/W_1", self.W_1)
+        np.save("params/W_out", self.W_out)
+        np.save("params/B_1", self.B_1)
+        np.save("params/B_out", self.B_out)

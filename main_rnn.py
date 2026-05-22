@@ -8,6 +8,18 @@ import numpy as np
 NEURONS_LAYER_HIDDEN = 5
 OUTPUT_NEURONS = 2
 
+# TODO: Restructure this file into the RNN class and provide clean access for the api file. 
+# Should also be able to load parameters from a file and assign them to its own.
+
+
+# OTHER TODOS: 
+# 1. Implement state saving (saving weights to .npy files after training)
+# 2. Implement state loading from path
+# 3. Finish frontend
+# 4. Documentation
+# 5. clean up code, add docstrings where missing, etc.
+
+
 W_1, W_out = initialize_weights(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
 B_1, B_out = initialize_biases(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
 
@@ -31,8 +43,9 @@ print(classify_sentiment("Ich bin ein Berliner", max_token, tokenizer))
 print("[ INIT ] Initializing backpropagation...")
 backprop = Backprop(W_1, W_out, B_1, B_out)
 print("[ INIT ] Calculating gradients for the first training example...")
+backprop.save_state()
 print(backprop.train(sequences, labels, 100))
-
+backprop.save_state()
 
 def forward_pass(X):
     if X == "Hello There":
