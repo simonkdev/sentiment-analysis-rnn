@@ -22,10 +22,10 @@ def load_data(file_path):
     labels = pd.get_dummies(df['label'], dtype=int).values
     print(f"[ INIT ] Data loaded from {file_path}.")
     print(labels)
-    return sequences, labels, max_token, tokenizer
+    return sequences[5000:], labels[5000:], max_token, tokenizer, sequences[:5000], labels[:5000:]
 
 def process_new_data(string, max_token, tokenizer):
-    sequence = np.array(tokenizer.texts_to_sequences([string]))
+    sequence = np.array(tokenizer.texts_to_sequences([string])[0])
     sequence = [t / max_token for t in sequence]
-    return sequence
+    return np.array(sequence).flatten()
 

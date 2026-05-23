@@ -1,4 +1,4 @@
-from src.forward_pass import forward_pass_one_input
+from src.forward_pass import forward_pass_one_input, forward_pass_input_vector
 from src.initialization import initialize_weights, initialize_biases
 from src.data_prep import load_data, process_new_data
 from src.backprop import Backprop
@@ -13,16 +13,14 @@ class RNN:
         self.W_1, self.W_out = initialize_weights(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
         self.B_1, self.B_out = initialize_biases(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
         self.backprop = Backprop(self.W_1, self.W_out, self.B_1, self.B_out)
-        self.sequences, self.labels, self.max_token, self.tokenizer = load_data(dataPath)
+        self.sequences, self.labels, self.max_token, self.tokenizer, self.test_seq, self.test_lab = load_data(dataPath)
 
     def classify_sentiment(self, text):
-        sequence = self.tokenizer.texts_to_sequences([text])[0]
-        sequence = [t / self.max_token for t in sequence]  # Normalize
-        sequence = np.array(sequence).flatten()  # Ensure 1D
+        sequence = process_new_data(text, self.max_token, self.tokenizer)
         label = forward_pass_one_input(sequence, self.W_1, self.W_out, self.B_1, self.B_out)
         if np.argmax(label) == 1:
-            return "negative"
-        return "positive"
+            return "positive"
+        return "negative"
         
     def train(self, iterations):
         self.backprop.train(self.sequences, self.labels, iterations)
@@ -31,6 +29,17 @@ class RNN:
     def load_trained_state(self):
         self.backprop.load_state()
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
+
+    def calculate_accuracy(self):
+        predictions = forward_pass_input_vector(self.test_seq, self.W_1, self.W_out, self.B_1, self.B_out)
+        deltas = predictions - np.array(self.test_lab)
+        correct_count = 0
+        for x in deltas.tolist():
+            if x == 0:
+                correct_count += 1
+        accuracy = correct_count / len(self.test_seq) * 100
+        print(f"ACCURACY IS APPROXIMATELY {accuracy}%")
+
 
 
 
@@ -70,4 +79,4 @@ class RNN:
 # def forward_pass(X):
 #     if X == "Hello There":
 #         return "General Kenobi!"
-#     return False;
+#     return False

@@ -8,7 +8,7 @@ CORS(app)
 
 rnn = RNN()
 rnn.load_trained_state()
-
+rnn.calculate_accuracy()
 
 @app.route('/api/process', methods=['POST'])
 def api_process():
