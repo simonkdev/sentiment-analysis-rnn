@@ -32,11 +32,9 @@ class RNN:
 
     def calculate_accuracy(self):
         predictions = forward_pass_input_vector(self.test_seq, self.W_1, self.W_out, self.B_1, self.B_out)
-        deltas = predictions - np.array(self.test_lab)
-        correct_count = 0
-        for x in deltas.tolist():
-            if x == 0:
-                correct_count += 1
+        pred_classes = np.argmax(predictions, axis=1)
+        true_classes = np.argmax(self.test_lab, axis=1)
+        correct_count = np.sum(pred_classes == true_classes)
         accuracy = correct_count / len(self.test_seq) * 100
         print(f"ACCURACY IS APPROXIMATELY {accuracy}%")
 
