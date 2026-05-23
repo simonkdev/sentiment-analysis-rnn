@@ -23,7 +23,7 @@ class Backprop:
         dW_out = np.dot(delta.T, hidden_outputs) / batch_size
         dB_out = np.sum(delta, axis=0, keepdims=True).T / batch_size
 
-        delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(hidden_pre_activation.reshape(-1, 5))
+        delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(hidden_pre_activation)
 
         dW_1 = delta_hidden.T.dot(x_h_last) / batch_size
         dB_1 = np.sum(delta_hidden, axis=0, keepdims=True).T / batch_size

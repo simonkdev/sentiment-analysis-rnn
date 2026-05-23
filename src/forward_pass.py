@@ -14,17 +14,20 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     index = 0
     W_hh = np.zeros((1, neurons_hidden)) # initialize W_hh as an empty arrays
     all_Z_1 = []
+    all_A_1 = []
     for x_t in X:
         x_t = np.array([[x_t]])
         x_h = np.hstack((x_t, W_hh)) # shape: [1, 2]
         Z_1, A_1 = forward_pass_one_layer_hidden(x_h, W_1, B_1, passActivations=True)
         all_Z_1.append(Z_1)
+        all_A_1.append(A_1)
         if index == len(X) - 1:
                 avg_Z_1 = np.mean(np.array(all_Z_1), axis=0)
                 output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
                 if passActivations:
                     #print(f"x_h shape: {x_h.shape}")
-                    return output, Z_1, A_1, A_5, x_h
+                    avg_A_1 = np.mean(np.array(all_A_1), axis=0)
+                    return output, avg_Z_1, avg_A_1, A_5, x_h
                 return output
         W_hh = Z_1
         index += 1
