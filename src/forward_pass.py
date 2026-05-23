@@ -11,12 +11,15 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     :param B_t: bias matrix for layer t, shape: [neuron_layer_t, 1]
     """
     index = 0
-    W_hh = np.zeros((1, 5)) # initialize W_hh as an empty arrays
+    W_hh = np.zeros((1, 64)) # initialize W_hh as an empty arrays
+    all_Z_1 = []
     for x_t in X:
         x_t = np.array([[x_t]])
         x_h = np.hstack((x_t, W_hh)) # shape: [1, 2]
         Z_1, A_1 = forward_pass_one_layer_hidden(x_h, W_1, B_1, passActivations=True)
+        all_Z_1.append(Z_1)
         if index == len(X) - 1:
+                avg_Z_1 = np.mean(np.array(all_Z_1), axis=0)
                 output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
                 if passActivations:
                     #print(f"x_h shape: {x_h.shape}")

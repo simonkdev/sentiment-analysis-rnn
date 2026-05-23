@@ -14,7 +14,13 @@
     python313Packages.gunicorn
     python313Packages.keras
     python313Packages.tqdm
+    openblas
   ];
-
+  tasks = {
+    "omp:setcores" = {
+      exec = "export OMP_NUM_THREADS=$(nproc)";
+      before = ["devenv:enterShell"];
+    };
+  };
   languages.python.enable = true;
 }

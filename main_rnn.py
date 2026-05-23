@@ -5,7 +5,7 @@ from src.backprop import Backprop
 
 import numpy as np
 
-NEURONS_LAYER_HIDDEN = 5
+NEURONS_LAYER_HIDDEN = 64
 OUTPUT_NEURONS = 2
 
 class RNN:
