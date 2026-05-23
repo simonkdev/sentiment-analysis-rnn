@@ -57,3 +57,12 @@ class Backprop:
         np.save("params/W_out", self.W_out)
         np.save("params/B_1", self.B_1)
         np.save("params/B_out", self.B_out)
+    
+    def load_state(self):
+        self.W_1 = np.load("params/W_1.npy")
+        self.W_out = np.load("params/W_out.npy")
+        self.B_1 = np.load("params/B_1.npy")
+        self.B_out = np.load("params/B_out.npy")
+    
+    def get_parameters(self):
+        return self.W_1, self.W_out, self.B_1, self.B_out
