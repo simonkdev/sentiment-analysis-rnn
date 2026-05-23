@@ -10,8 +10,9 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     :param W_t: weight matrix for layer t, shape: [neurons_in_previous_layer, 2]    
     :param B_t: bias matrix for layer t, shape: [neuron_layer_t, 1]
     """
+    neurons_hidden = W_1.shape[0]
     index = 0
-    W_hh = np.zeros((1, 64)) # initialize W_hh as an empty arrays
+    W_hh = np.zeros((1, neurons_hidden)) # initialize W_hh as an empty arrays
     all_Z_1 = []
     for x_t in X:
         x_t = np.array([[x_t]])

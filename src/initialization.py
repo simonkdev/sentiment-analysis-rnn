@@ -12,9 +12,10 @@ def initialize_weights(neurons_hidden, output_neurons):
     """
     print("[ INIT ] Initializing weights...")
     # Xavier/Glorot initialization for tanh
-    scale_w1 = np.sqrt(6.0 / (6 + neurons_hidden))
+    input_dim = 1 + neurons_hidden
+    scale_w1 = np.sqrt(6.0 / (input_dim + neurons_hidden))
     scale_wout = np.sqrt(6.0 / (neurons_hidden + output_neurons))
-    W_1 = np.random.normal(0, scale_w1, (neurons_hidden, 6))
+    W_1 = np.random.normal(0, scale_w1, (neurons_hidden, input_dim))
     W_out = np.random.normal(0, scale_wout, (output_neurons, neurons_hidden))
     print("[ INIT ] Weights initialized.")
     return W_1, W_out
