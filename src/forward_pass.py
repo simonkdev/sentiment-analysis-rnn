@@ -23,7 +23,7 @@ def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
         all_A_1.append(A_1)
         if index == len(X) - 1:
                 avg_Z_1 = np.mean(np.array(all_Z_1), axis=0)
-                output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
+                output, A_5 = forward_pass_one_layer_hidden(avg_Z_1, W_out, B_out, output_layer=True, passActivations=True)
                 if passActivations:
                     #print(f"x_h shape: {x_h.shape}")
                     avg_A_1 = np.mean(np.array(all_A_1), axis=0)

@@ -18,7 +18,7 @@
   ];
   tasks = {
     "omp:setcores" = {
-      exec = "export OMP_NUM_THREADS=$(nproc)";
+      exec = "export OMP_NUM_THREADS=8";
       before = ["devenv:enterShell"];
     };
   };
