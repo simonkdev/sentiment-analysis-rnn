@@ -14,32 +14,51 @@ class Backprop:
         self.learning_rate = learning_rate
     
     def calculate_gradients(self, X, Y_true, passPredictions=False):
-        predictions, hidden_outputs, hidden_pre_activation, output_pre_activation, x_h_last = forward_pass_input_vector(X, self.W_1, self.W_out, self.B_1, self.B_out, passActivations=True)
+        predictions, all_Z_1, all_A_1, _, all_x_h = forward_pass_input_vector(X, self.W_1, self.W_out, self.B_1, self.B_out, passActivations=True)
         
-        delta = predictions - Y_true
         batch_size = len(X)
+        seq_len = len(all_Z_1[0])
 
-        dW_out = np.dot(delta.T, hidden_outputs) / batch_size
+        delta = predictions - Y_true  # shape: (batch_size, output_neurons)
+        dW_out = np.dot(delta.T, all_Z_1[:, -1]) / batch_size
         dB_out = np.sum(delta, axis=0, keepdims=True).T / batch_size
 
         dW_1 = np.zeros_like(self.W_1)
         dB_1 = np.zeros_like(self.B_1)
         
-        delta_hidden = np.dot(delta, self.W_out) * tanh_derivative(hidden_pre_activation)
+        for seq_idx in range(batch_size):
+            seq_Z = all_Z_1[seq_idx]  # shape: (seq_len, neurons_hidden)
+            seq_x_h = all_x_h[seq_idx]  # shape: (seq_len, 1 + neurons_hidden)
+            seq_A = all_A_1[seq_idx]  # shape: (seq_len, neurons_hidden)
 
-        for t in reversed(range(len(X))):
-            dW_1 += np.dot(delta_hidden.T, x_h_last[t] / batch_size)
-            dB_1 += np.sum(delta_hidden, axis=0, keepdims=True).T / batch_size
+            seq_delta = delta[seq_idx]
+            seq_delta_hidden = np.dot(seq_delta.T, self.W_out) * tanh_derivative(seq_A[-1])
 
-            if t > 0:
-                jacobian = np.diag(1 - hidden_outputs[t]**2) @ self.W_1[:, 1:].T
-                delta_hidden = delta_hidden @ jacobian
+            for t in reversed(range(len(X))):
+                dW_1 += np.dot(seq_delta_hidden.reshape(-1,1), seq_x_h[t].reshape(1, -1))
+                dB_1 += seq_delta_hidden.reshape(-1, 1)
+
+                if t > 0:
+                    # Jacobian: ∂h_t / ∂h_{t-1} = diag(1 - h_t^2) * W_h
+                    # W_h is the second column of W_1 (weights for h_{t-1})
+                    jacobian = np.diag(1 - seq_Z[t]**2) @ self.W_1[:, 1:].T
+                    seq_delta_hidden = seq_delta_hidden @ jacobian
+
+        dW_1 /= batch_size
+        dB_1 /= batch_size
 
         if passPredictions:
             return dW_1, dB_1, dW_out, dB_out, predictions
         return dW_1, dB_1, dW_out, dB_out
 
     def update_parameters(self, dW_1, dB_1, dW_out, dB_out, learning_rate):
+        # Clip gradients to avoid exploding values
+        dW_1 = np.clip(dW_1, -1.0, 1.0)
+        dB_1 = np.clip(dB_1, -1.0, 1.0)
+        dW_out = np.clip(dW_out, -1.0, 1.0)
+        dB_out = np.clip(dB_out, -1.0, 1.0)
+
+
         self.W_1 -= learning_rate * dW_1
         self.B_1 -= learning_rate * dB_1
         self.W_out -= learning_rate * dW_out

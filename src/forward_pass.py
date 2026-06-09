@@ -3,33 +3,26 @@ import numpy as np
 import tqdm as tqdm
 
 def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
-    """
-    Performs a forward pass through the recurrent neural network for one single input.
-    
-    :param X: vector (list) of initial input features (shape: [1, d])
-    :param W_t: weight matrix for layer t, shape: [neurons_in_previous_layer, 2]    
-    :param B_t: bias matrix for layer t, shape: [neuron_layer_t, 1]
-    """
     neurons_hidden = W_1.shape[0]
     index = 0
-    W_hh = np.zeros((1, neurons_hidden)) # initialize W_hh as an empty arrays
-    all_Z_1 = []
+    W_hh = np.zeros((1, neurons_hidden))  # Initial hidden state
+    all_Z_1 = []  # Store ALL hidden states (not just the average)
     all_A_1 = []
+    all_x_h = []  # Store ALL x_h (input + hidden) for backprop
     for x_t in X:
         x_t = np.array([[x_t]])
-        x_h = np.hstack((x_t, W_hh)) # shape: [1, 2]
+        x_h = np.hstack((x_t, W_hh))  # [x_t, h_{t-1}]
+        all_x_h.append(x_h)  # Save for backprop
         Z_1, A_1 = forward_pass_one_layer_hidden(x_h, W_1, B_1, passActivations=True)
         all_Z_1.append(Z_1)
         all_A_1.append(A_1)
         if index == len(X) - 1:
-                avg_Z_1 = np.mean(np.array(all_Z_1), axis=0)
-                output, A_5 = forward_pass_one_layer_hidden(avg_Z_1, W_out, B_out, output_layer=True, passActivations=True)
-                if passActivations:
-                    #print(f"x_h shape: {x_h.shape}")
-                    avg_A_1 = np.mean(np.array(all_A_1), axis=0)
-                    return output, avg_Z_1, avg_A_1, A_5, x_h
-                return output
-        W_hh = Z_1
+            # Use LAST hidden state (not average) for output
+            output, A_5 = forward_pass_one_layer_hidden(Z_1, W_out, B_out, output_layer=True, passActivations=True)
+            if passActivations:
+                return output, np.array(all_Z_1), np.array(all_A_1), A_5, np.array(all_x_h)
+            return output
+        W_hh = Z_1  # Update hidden state for next step
         index += 1
             
 def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivations=False):
@@ -50,19 +43,25 @@ def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivatio
     return Z_n # shape: 1, neurons_layer_n
 
 def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
-    X_list = X #.tolist()
+    X_list = X
     out_list = []
-    z1_list = []
-    a1_list = []
+    all_Z_1_list = []  # List of all hidden states for EACH sequence
+    all_A_1_list = []
     a5_list = []
-    x_h_list = []
+    all_x_h_list = []  # List of all x_h for EACH sequence
     for x in tqdm.tqdm(X_list):
-        out, z1, a1, a5, x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
+        out, all_Z_1, all_A_1, a5, all_x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
         out_list.append(out)
-        a1_list.append(a1.flatten())
-        z1_list.append(z1.flatten())
-        a5_list.append(a5.flatten())
-        x_h_list.append(x_h.flatten())
+        all_Z_1_list.append(all_Z_1.flatten())
+        all_A_1_list.append(all_A_1.flatten())
+        a5_list.append(a5)
+        all_x_h_list.append(all_x_h.flatten())
     if passActivations:
-        return np.array(out_list).reshape(len(X), -1), np.array(a1_list), np.array(z1_list), np.array(a5_list), np.array(x_h_list)
+        return (
+            np.array(out_list).reshape(len(X), -1),  # Predictions (batch, output_dim)
+            np.array(all_Z_1_list),                  # All hidden states (batch, seq_len, hidden_dim)
+            np.array(all_A_1_list),                  # All pre-activations (batch, seq_len, hidden_dim)
+            np.array(a5_list),                      # Output pre-activations (batch, output_dim)
+            np.array(all_x_h_list)                   # All x_h (batch, seq_len, 2)
+        )
     return np.array(out_list).reshape(len(X), -1)

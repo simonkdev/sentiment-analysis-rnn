@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+max_len = 150
 
 def data_tokenization(dataframe):
     print("[ INIT ] Tokenizing text data...")
@@ -11,7 +14,9 @@ def data_tokenization(dataframe):
     sequences = tokenizer.texts_to_sequences(dataframe['text'])
 
     max_token = max(max(seq) for seq in sequences) if sequences else 1
-    sequences = [[t / max_token for t in seq] for seq in sequences]
+    #sequences = [[t / max_token for t in seq] for seq in sequences]
+
+    sequences = pad_sequences(sequences, maxlen=max_len, padding='post', truncating='post')
     
     return sequences, max_token, tokenizer
 
