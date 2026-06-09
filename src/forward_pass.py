@@ -2,6 +2,8 @@ from src.activation import tanh, softmax
 import numpy as np
 import tqdm as tqdm
 
+NEURONS_HIDDEN = 1
+
 def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     neurons_hidden = W_1.shape[0]
     index = 0
@@ -52,10 +54,11 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     for x in tqdm.tqdm(X_list):
         out, all_Z_1, all_A_1, a5, all_x_h = forward_pass_one_input(x, W_1, W_out, B_1, B_out, passActivations=True)
         out_list.append(out)
-        all_Z_1_list.append(all_Z_1.flatten())
-        all_A_1_list.append(all_A_1.flatten())
+        all_Z_1_list.append(np.array(all_Z_1).reshape(-1, NEURONS_HIDDEN))
+        all_A_1_list.append(np.array(all_A_1).reshape(-1, NEURONS_HIDDEN))
+        all_x_h_list.append(np.array(all_x_h).reshape(-1, 1 + NEURONS_HIDDEN))
         a5_list.append(a5)
-        all_x_h_list.append(all_x_h.flatten())
+        
     if passActivations:
         return (
             np.array(out_list).reshape(len(X), -1),  # Predictions (batch, output_dim)

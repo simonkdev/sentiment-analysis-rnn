@@ -6,7 +6,7 @@ from src.activation import tanh_derivative
 from src.forward_pass import forward_pass_input_vector
 
 class Backprop:
-    def __init__(self, W_1, W_out, B_1, B_out, learning_rate=0.01):
+    def __init__(self, W_1, W_out, B_1, B_out, learning_rate=0.1):
         self.W_1 = W_1
         self.W_out = W_out
         self.B_1 = B_1
@@ -34,14 +34,14 @@ class Backprop:
             seq_delta = delta[seq_idx]
             seq_delta_hidden = np.dot(seq_delta.T, self.W_out) * tanh_derivative(seq_A[-1])
 
-            for t in reversed(range(len(X))):
+            for t in reversed(range(seq_len)):
                 dW_1 += np.dot(seq_delta_hidden.reshape(-1,1), seq_x_h[t].reshape(1, -1))
                 dB_1 += seq_delta_hidden.reshape(-1, 1)
 
                 if t > 0:
                     # Jacobian: ∂h_t / ∂h_{t-1} = diag(1 - h_t^2) * W_h
                     # W_h is the second column of W_1 (weights for h_{t-1})
-                    jacobian = np.diag(1 - seq_Z[t]**2) @ self.W_1[:, 1:].T
+                    jacobian = np.diag(1 - seq_Z[t].flatten()**2) @ self.W_1[:, 1:].T
                     seq_delta_hidden = seq_delta_hidden @ jacobian
 
         dW_1 /= batch_size
@@ -101,6 +101,6 @@ class Backprop:
         :param W_1: Weight matrix for the hidden layer (shape: [neurons_hidden, 2])
         :return: Jacobian matrix (shape: [neurons_hidden, neurons_hidden])
         """
-        diag_matrix = np.diag(1 - Z_t**2)
+        diag_matrix = np.diag(1 - Z_t.flatten()**2)
         jacobian = np.dot(diag_matrix, W_1.T)
         return jacobian
