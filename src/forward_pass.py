@@ -2,7 +2,7 @@ from src.activation import tanh, softmax
 import numpy as np
 import tqdm as tqdm
 
-NEURONS_HIDDEN = 1
+NEURONS_HIDDEN = 8
 
 # def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
 #     neurons_hidden = W_1.shape[0]
@@ -26,19 +26,19 @@ NEURONS_HIDDEN = 1
 #             return output
 #         W_hh = Z_1  # Update hidden state for next step
 #         index += 1
-            
+
 def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivations=False):
     """
-    Performs fwd pass for one hidden layer. 
+    Performs fwd pass for one hidden layer.
 
     :param X_n: vector of input features for the n-th layer (shape: [n, d])
     :param W_n: matrix of weights for the n-th layer (1 row per neuron: (shape: [neurons_per_layer, 2]))
     :param B: vector of biases for the n-th layer (shape: [neurons_per_layer, 1])
     """
     A_n = np.dot(X_n, W_n.T) + B.T
-    if not output_layer: 
-        Z_n = tanh(A_n) 
-    else: 
+    if not output_layer:
+        Z_n = tanh(A_n)
+    else:
         Z_n = softmax(A_n)
     if passActivations:
         return Z_n, A_n
@@ -58,7 +58,7 @@ def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivatio
 #         all_A_1_list.append(np.array(all_A_1).reshape(-1, NEURONS_HIDDEN))
 #         all_x_h_list.append(np.array(all_x_h).reshape(-1, 1 + NEURONS_HIDDEN))
 #         a5_list.append(a5)
-        
+
 #     if passActivations:
 #         return (
 #             np.array(out_list).reshape(len(X), -1),  # Predictions (batch, output_dim)
@@ -113,7 +113,7 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     # Output layer using last hidden state
     A_out = np.dot(h_prev, W_out.T) + B_out.T  # [batch_size, output_neurons]
     predictions = softmax(A_out)
-    
+
     if passActivations:
         return predictions, all_Z_1, all_A_1, A_out, all_x_h
     return predictions

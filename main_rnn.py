@@ -5,7 +5,7 @@ from src.backprop import Backprop
 
 import numpy as np
 
-NEURONS_LAYER_HIDDEN = 1
+NEURONS_LAYER_HIDDEN = 8
 OUTPUT_NEURONS = 2
 
 class RNN:
@@ -21,11 +21,11 @@ class RNN:
         if np.argmax(label) == 1:
             return "positive"
         return "negative"
-        
+
     def train(self, iterations):
         self.backprop.train(self.sequences, self.labels, iterations)
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
-    
+
     def load_trained_state(self):
         self.backprop.load_state()
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
@@ -40,15 +40,13 @@ class RNN:
 
 
 
-
-
-# TODO: Restructure this file into the RNN class and provide clean access for the api file. 
+# TODO: Restructure this file into the RNN class and provide clean access for the api file.
 # Should also be able to load parameters from a file and assign them to its own.
 
 
-# OTHER TODOS: 
+# OTHER TODOS:
 # 1. Implement state saving (saving weights to .npy files after training)   done
-# 2. Implement state loading from path  done 
+# 2. Implement state loading from path  done
 # 3. Finish frontend
 # 4. Documentation
 # 5. clean up code, add docstrings where missing, etc.
