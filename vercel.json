@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/index.py": {
-      "excludeFiles": "{.devenv/**,__pycache__/**,data/**,params/bak/**,train.py,devenv.*,*.lock}"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
