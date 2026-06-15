@@ -40,8 +40,8 @@ class Backprop:
         # Initial hidden delta for all sequences
         delta_hidden = np.einsum('bi,ij->bj', delta, self.W_out) * tanh_derivative(all_A_1[:, -1, :])  # [batch_size, neurons_hidden]
 
-        # Precompute tanh derivatives for all time steps
         tanh_derivs = tanh_derivative(all_A_1)  # [batch_size, seq_len, neurons_hidden]
+        recurrent_weights = self.W_1[:, 1:]  # [neurons_hidden, neurons_hidden]
 
         # Process time steps in reverse
         for t in reversed(range(seq_len)):
@@ -51,16 +51,8 @@ class Backprop:
             dW_1 += np.einsum('bi,bj->ij', delta_hidden, x_h_t)  # [neurons_hidden, 1 + neurons_hidden]
             dB_1 += delta_hidden.sum(axis=0, keepdims=True).T  # [neurons_hidden, 1]
 
-            # Propagate delta backward through time (BPTT)
             if t > 0:
-                # Jacobian: ∂h_t / ∂h_{t-1} = diag(1 - h_t^2) * W_1[:, 1:]
-                # For neurons_hidden=1, this simplifies to scalar multiplication
-                if neurons_hidden == 1:
-                    jacobian_factor = tanh_derivs[:, t, 0] * self.W_1[0, 1]
-                    delta_hidden = delta_hidden * jacobian_factor.reshape(-1, 1)
-                else:
-                    # General case: element-wise multiplication with recurrent weights
-                    delta_hidden = delta_hidden * (tanh_derivs[:, t, :] * self.W_1[:, 1:].T)
+                delta_hidden = (delta_hidden @ recurrent_weights) * tanh_derivs[:, t - 1, :]
 
         # Average gradients over batch
         dW_1 /= batch_size
@@ -127,12 +119,27 @@ class Backprop:
         if passPredictions: return predictions
 
 
-    def train(self, X_train, Y_train, epochs):
+    def train(self, X_train, Y_train, epochs, batch_size=256, shuffle=True):
         loss_history = []
         progress = tqdm.tqdm(range(epochs), desc="Training") if tqdm else range(epochs)
         for epoch in progress:
-            predictions = self.training_step(X_train, Y_train, passPredictions=True)
-            loss = -np.mean(Y_train * np.log(predictions + 1e-18))
+            if shuffle:
+                indices = np.random.permutation(len(X_train))
+                X_epoch = X_train[indices]
+                Y_epoch = Y_train[indices]
+            else:
+                X_epoch = X_train
+                Y_epoch = Y_train
+
+            epoch_losses = []
+            for start in range(0, len(X_epoch), batch_size):
+                end = start + batch_size
+                X_batch = X_epoch[start:end]
+                Y_batch = Y_epoch[start:end]
+                predictions = self.training_step(X_batch, Y_batch, passPredictions=True)
+                epoch_losses.append(-np.mean(Y_batch * np.log(predictions + 1e-18)))
+
+            loss = np.mean(epoch_losses)
             loss_history.append(loss)
             if tqdm:
                 progress.set_postfix(loss=f"{loss:.4f}")
