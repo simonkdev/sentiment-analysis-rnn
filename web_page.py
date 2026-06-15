@@ -264,7 +264,7 @@ INDEX_HTML = """<!DOCTYPE html>
     <main>
         <header>
             <span class="eyebrow">Educational RNN demo</span>
-            <h1>Sentiment analysis with a small recurrent neural network</h1>
+            <h1>Sentiment analysis using a recurrent neural network</h1>
             <p class="intro">
                 Paste a movie-review style sentence or paragraph. The model returns a positive or negative label and the two raw class probabilities.
             </p>
