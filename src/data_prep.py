@@ -57,11 +57,11 @@ def load_tokenizer(path=DEFAULT_TOKENIZER_PATH):
     )
 
 
-def pad_sequences(sequences, maxlen, padding="post", truncating="post"):
-    padded_sequences = np.zeros((len(sequences), maxlen), dtype=int)
+def pad_sequences(sequences, maxlen, padding="pre", truncating="pre"):
+    padded_sequences = np.zeros((len(sequences), maxlen), dtype=float)
 
     for index, sequence in enumerate(sequences):
-        truncated = sequence[:maxlen] if truncating == "post" else sequence[-maxlen:]
+        truncated = np.asarray(sequence[:maxlen] if truncating == "post" else sequence[-maxlen:], dtype=float)
         if padding == "post":
             padded_sequences[index, : len(truncated)] = truncated
         else:
@@ -77,10 +77,10 @@ def data_tokenization(dataframe):
     print("[ INIT ] Text data tokenized.")
     sequences = tokenizer.texts_to_sequences([row["text"] for row in dataframe])
 
-    max_token = max(max(seq) for seq in sequences) if sequences else 1
-    #sequences = [[t / max_token for t in seq] for seq in sequences]
+    max_token = max(max(seq) for seq in sequences if seq) if sequences else 1
+    sequences = [[token / max_token for token in sequence] for sequence in sequences]
 
-    sequences = pad_sequences(sequences, maxlen=max_len, padding='post', truncating='post')
+    sequences = pad_sequences(sequences, maxlen=max_len)
     
     return sequences, max_token, tokenizer
 
@@ -98,6 +98,6 @@ def load_data(file_path):
     return sequences[5000:], labels[5000:], max_token, tokenizer, sequences[:5000], labels[:5000:]
 
 def process_new_data(string, max_token, tokenizer):
-    sequence = np.array(tokenizer.texts_to_sequences([string])[0])
-    sequence = [t / max_token for t in sequence]
-    return np.array(sequence).flatten()
+    sequence = tokenizer.texts_to_sequences([string])[0]
+    sequence = [token / max_token for token in sequence]
+    return pad_sequences([sequence], maxlen=max_len)[0]
