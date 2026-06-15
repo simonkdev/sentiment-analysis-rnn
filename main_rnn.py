@@ -1,6 +1,6 @@
 from src.forward_pass import forward_pass_one_input, forward_pass_input_vector
 from src.initialization import initialize_weights, initialize_biases
-from src.data_prep import load_data, process_new_data
+from src.data_prep import load_data, load_tokenizer, process_new_data
 from src.backprop import Backprop
 
 import numpy as np
@@ -9,11 +9,20 @@ NEURONS_LAYER_HIDDEN = 8
 OUTPUT_NEURONS = 2
 
 class RNN:
-    def __init__(self, dataPath = "data/IMDB Dataset.csv"):
+    def __init__(self, dataPath="data/IMDB Dataset.csv", load_dataset=False):
         self.W_1, self.W_out = initialize_weights(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
         self.B_1, self.B_out = initialize_biases(NEURONS_LAYER_HIDDEN, OUTPUT_NEURONS)
         self.backprop = Backprop(self.W_1, self.W_out, self.B_1, self.B_out)
-        self.sequences, self.labels, self.max_token, self.tokenizer, self.test_seq, self.test_lab = load_data(dataPath)
+        self.sequences = None
+        self.labels = None
+        self.test_seq = None
+        self.test_lab = None
+
+        if load_dataset:
+            self.sequences, self.labels, self.max_token, self.tokenizer, self.test_seq, self.test_lab = load_data(dataPath)
+        else:
+            self.tokenizer = load_tokenizer()
+            self.max_token = max(self.tokenizer.word_index.values(), default=1)
 
     def classify_sentiment(self, text):
         sequence = process_new_data(text, self.max_token, self.tokenizer)
@@ -23,6 +32,8 @@ class RNN:
         return "negative"
 
     def train(self, iterations):
+        if self.sequences is None or self.labels is None:
+            raise RuntimeError("Training requires RNN(load_dataset=True).")
         self.backprop.train(self.sequences, self.labels, iterations)
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
 
@@ -31,6 +42,8 @@ class RNN:
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
 
     def calculate_accuracy(self):
+        if self.test_seq is None or self.test_lab is None:
+            raise RuntimeError("Accuracy calculation requires RNN(load_dataset=True).")
         predictions = forward_pass_input_vector(self.test_seq, self.W_1, self.W_out, self.B_1, self.B_out)
         pred_classes = np.argmax(predictions, axis=1)
         true_classes = np.argmax(self.test_lab, axis=1)

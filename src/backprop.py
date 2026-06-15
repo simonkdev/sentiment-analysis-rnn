@@ -1,6 +1,9 @@
 import numpy as np 
-import pandas as pd
-import tqdm as tqdm
+
+try:
+    import tqdm
+except ImportError:
+    tqdm = None
 
 from src.activation import tanh_derivative
 from src.forward_pass import forward_pass_input_vector
@@ -126,12 +129,13 @@ class Backprop:
 
     def train(self, X_train, Y_train, epochs):
         loss_history = []
-        with tqdm.tqdm(range(epochs), desc="Training") as pbar:
-            for epoch in pbar:
-                predictions = self.training_step(X_train, Y_train, passPredictions=True)
-                loss = -np.mean(Y_train * np.log(predictions + 1e-18))
-                loss_history.append(loss)
-                pbar.set_postfix(loss=f"{loss:.4f}")
+        progress = tqdm.tqdm(range(epochs), desc="Training") if tqdm else range(epochs)
+        for epoch in progress:
+            predictions = self.training_step(X_train, Y_train, passPredictions=True)
+            loss = -np.mean(Y_train * np.log(predictions + 1e-18))
+            loss_history.append(loss)
+            if tqdm:
+                progress.set_postfix(loss=f"{loss:.4f}")
         return loss_history
 
 

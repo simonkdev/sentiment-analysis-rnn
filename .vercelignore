@@ -1,0 +1,11 @@
+.devenv
+.devenv*
+.direnv
+.git
+.vscode
+__pycache__
+*.pyc
+data
+params/bak
+train.py
+devenv.*

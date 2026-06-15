@@ -1,6 +1,6 @@
 from main_rnn import RNN
 
-rnn = RNN()
+rnn = RNN(load_dataset=True)
 rnn.load_trained_state()
 #rnn.calculate_accuracy()
 rnn.backprop.save_state()
