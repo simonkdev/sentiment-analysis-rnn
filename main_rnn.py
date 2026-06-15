@@ -31,10 +31,10 @@ class RNN:
             return "positive"
         return "negative"
 
-    def train(self, iterations):
+    def train(self, iterations, batch_size=256):
         if self.sequences is None or self.labels is None:
             raise RuntimeError("Training requires RNN(load_dataset=True).")
-        self.backprop.train(self.sequences, self.labels, iterations)
+        self.backprop.train(self.sequences, self.labels, iterations, batch_size=batch_size)
         self.W_1, self.W_out, self.B_1, self.B_out = self.backprop.get_parameters()
 
     def load_trained_state(self):

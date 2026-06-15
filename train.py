@@ -1,9 +1,6 @@
 from main_rnn import RNN
 
 rnn = RNN(load_dataset=True)
-rnn.load_trained_state()
-#rnn.calculate_accuracy()
-rnn.backprop.save_state()
-rnn.train(20000)
+rnn.train(iterations=20, batch_size=256)
 rnn.backprop.save_state()
 rnn.calculate_accuracy()
