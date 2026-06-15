@@ -2,38 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from main_rnn import RNN
-
-INDEX_HTML = """<!DOCTYPE html>
-<html>
-<head>
-    <title>Text Processor</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-        textarea, button { width: 100%; margin: 10px 0; }
-        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
-    </style>
-</head>
-<body>
-    <h1>Text Processor</h1>
-    <textarea id="inputText" rows="4" placeholder="Enter text here..."></textarea>
-    <button onclick="processText()">Process</button>
-    <div id="result"></div>
-
-    <script>
-        async function processText() {
-            const text = document.getElementById('inputText').value;
-            const response = await fetch('/api/process', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text })
-            });
-            const data = await response.json();
-            document.getElementById('result').textContent = data.result || data.error;
-        }
-    </script>
-</body>
-</html>
-"""
+from web_page import INDEX_HTML
 
 app = Flask(__name__)
 CORS(app)
@@ -60,8 +29,15 @@ def api_process():
     if not isinstance(text, str) or not text.strip():
         return jsonify({"error": "Text is required."}), 400
 
-    result = rnn.classify_sentiment(text)
-    return jsonify({"result": result})
+    scores = rnn.predict_sentiment_scores(text)
+    result = "positive" if scores[1] > scores[0] else "negative"
+    return jsonify({
+        "result": result,
+        "scores": {
+            "negative": float(scores[0]),
+            "positive": float(scores[1]),
+        },
+    })
 
 
 if __name__ == "__main__":

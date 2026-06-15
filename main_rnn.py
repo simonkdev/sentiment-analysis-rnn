@@ -25,11 +25,14 @@ class RNN:
             self.max_token = max(self.tokenizer.word_index.values(), default=1)
 
     def classify_sentiment(self, text):
-        sequence = process_new_data(text, self.max_token, self.tokenizer)
-        label = forward_pass_one_input(sequence, self.W_1, self.W_out, self.B_1, self.B_out)
+        label = self.predict_sentiment_scores(text)
         if np.argmax(label) == 1:
             return "positive"
         return "negative"
+
+    def predict_sentiment_scores(self, text):
+        sequence = process_new_data(text, self.max_token, self.tokenizer)
+        return forward_pass_one_input(sequence, self.W_1, self.W_out, self.B_1, self.B_out)
 
     def train(self, iterations, batch_size=256):
         if self.sequences is None or self.labels is None:
