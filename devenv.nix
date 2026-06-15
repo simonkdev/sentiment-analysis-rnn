@@ -7,7 +7,7 @@
 }: {
   packages = with pkgs; [
     git
-    python313Packages.cupy
+#    python313Packages.cupy
     python313Packages.numpy
     python313Packages.pandas
     python313Packages.flask

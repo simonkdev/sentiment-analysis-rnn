@@ -12,4 +12,4 @@ devenv.local.yaml
 __pycache__*
 __pycache__/main_rnn.cpython-313.pyc
 
-params/*
+#params/*
