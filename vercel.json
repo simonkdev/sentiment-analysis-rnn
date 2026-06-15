@@ -1,7 +1,6 @@
 {
   "functions": {
     "api/index.py": {
-      "runtime": "python3.12",
       "excludeFiles": "{.devenv/**,__pycache__/**,data/**,params/bak/**,train.py,devenv.*,*.lock}"
     }
   },
