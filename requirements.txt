@@ -5,3 +5,4 @@ Flask-CORS
 gunicorn
 keras
 tqdm
+tensorflow
