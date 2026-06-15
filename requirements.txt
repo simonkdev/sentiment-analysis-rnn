@@ -1,0 +1,8 @@
+cuPy
+numpy
+pandas
+Flask
+Flask-CORS
+gunicorn
+keras
+tqdm
