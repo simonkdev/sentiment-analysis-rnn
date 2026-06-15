@@ -1,14 +1,22 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from main_rnn import RNN
 from web_page import INDEX_HTML
 
 app = Flask(__name__)
 CORS(app)
 
-rnn = RNN()
-rnn.load_trained_state()
+_rnn = None
+
+
+def get_rnn():
+    global _rnn
+    if _rnn is None:
+        from main_rnn import RNN
+
+        _rnn = RNN()
+        _rnn.load_trained_state()
+    return _rnn
 
 
 @app.route("/", methods=["GET"])
@@ -29,7 +37,7 @@ def api_process():
     if not isinstance(text, str) or not text.strip():
         return jsonify({"error": "Text is required."}), 400
 
-    scores = rnn.predict_sentiment_scores(text)
+    scores = get_rnn().predict_sentiment_scores(text)
     result = "positive" if scores[1] > scores[0] else "negative"
     return jsonify({
         "result": result,
