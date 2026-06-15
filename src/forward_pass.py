@@ -1,6 +1,5 @@
 from src.activation import tanh, softmax
 import numpy as np
-import tqdm as tqdm
 
 NEURONS_HIDDEN = 8
 
