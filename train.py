@@ -5,6 +5,7 @@ CHECKPOINT_INTERVAL = 50
 BATCH_SIZE = 256
 
 rnn = RNN(load_dataset=True)
+best_accuracy = float("-inf")
 
 for completed_iterations in range(0, TOTAL_ITERATIONS, CHECKPOINT_INTERVAL):
     iterations = min(CHECKPOINT_INTERVAL, TOTAL_ITERATIONS - completed_iterations)
@@ -14,9 +15,13 @@ for completed_iterations in range(0, TOTAL_ITERATIONS, CHECKPOINT_INTERVAL):
     rnn.train(iterations=iterations, batch_size=BATCH_SIZE)
 
     print(f"[ EVAL ] Accuracy after {next_checkpoint} iterations:")
-    rnn.calculate_accuracy()
+    accuracy = rnn.calculate_accuracy()
 
-    print(f"[ SAVE ] Saving state after {next_checkpoint} iterations...")
-    rnn.save_trained_state()
+    if accuracy > best_accuracy:
+        best_accuracy = accuracy
+        print(f"[ SAVE ] New best accuracy: {best_accuracy:.2f}%. Saving state...")
+        rnn.save_trained_state()
+    else:
+        print(f"[ SKIP ] Accuracy did not beat best score: {best_accuracy:.2f}%.")
 
-print("[ DONE ] Training complete.")
+print(f"[ DONE ] Training complete. Best accuracy: {best_accuracy:.2f}%.")
