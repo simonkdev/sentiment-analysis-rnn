@@ -77,6 +77,19 @@ class EmbeddingLayer:
                     embedded_sequences[i, j] = self.embedding_matrix[token]
         return embedded_sequences
 
+    def update_parameters(self, token_sequences, embedding_gradients, learning_rate):
+        token_gradients = {}
+        for sequence, sequence_gradients in zip(token_sequences, embedding_gradients):
+            for token, gradient in zip(sequence, sequence_gradients):
+                if token == 0 or token >= len(self.embedding_matrix):
+                    continue
+                if token not in token_gradients:
+                    token_gradients[token] = np.zeros(self.embedding_dim)
+                token_gradients[token] += gradient
+
+        for token, gradient in token_gradients.items():
+            self.embedding_matrix[token] -= learning_rate * np.clip(gradient, -1.0, 1.0)
+
     def save_state(self, path=DEFAULT_EMBEDDING_PATH):
         np.save(path, self.embedding_matrix)
 

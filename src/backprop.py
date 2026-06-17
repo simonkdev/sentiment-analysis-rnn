@@ -34,9 +34,9 @@ class Backprop:
         dW_out = delta.T @ all_Z_1[:, -1, :] / batch_size  # [output_neurons, neurons_hidden]
         dB_out = delta.sum(axis=0, keepdims=True).T / batch_size  # [output_neurons, 1]
 
-        # Hidden layer gradients
         dW_1 = np.zeros_like(self.W_1)
         dB_1 = np.zeros_like(self.B_1)  # [neurons_hidden, 1]
+        dX = np.zeros_like(X)
 
         # Initial hidden delta for all sequences
         delta_hidden = np.einsum('bi,ij->bj', delta, self.W_out) * tanh_derivative(all_A_1[:, -1, :])  # [batch_size, neurons_hidden]
@@ -51,6 +51,7 @@ class Backprop:
             # Accumulate gradients (vectorized across batch)
             dW_1 += np.einsum('bi,bj->ij', delta_hidden, x_h_t)  # [neurons_hidden, 1 + neurons_hidden]
             dB_1 += delta_hidden.sum(axis=0, keepdims=True).T  # [neurons_hidden, 1]
+            dX[:, t, :] = delta_hidden @ self.W_1[:, :input_features]
 
             if t > 0:
                 delta_hidden = (delta_hidden @ recurrent_weights) * tanh_derivs[:, t - 1, :]
@@ -60,8 +61,8 @@ class Backprop:
         dB_1 /= batch_size
 
         if passPredictions:
-            return dW_1, dB_1, dW_out, dB_out, predictions
-        return dW_1, dB_1, dW_out, dB_out
+            return dW_1, dB_1, dW_out, dB_out, dX, predictions
+        return dW_1, dB_1, dW_out, dB_out, dX
     
     # def calculate_gradients(self, X, Y_true, passPredictions=False):
     #     predictions, all_Z_1, all_A_1, _, all_x_h = forward_pass_input_vector(X, self.W_1, self.W_out, self.B_1, self.B_out, passActivations=True)
@@ -115,9 +116,11 @@ class Backprop:
         self.B_out -= learning_rate * dB_out
 
     def training_step(self, X, Y_true, passPredictions=False):
-        dW_1, dB_1, dW_out, dB_out, predictions = self.calculate_gradients(X, Y_true, passPredictions=True)
+        dW_1, dB_1, dW_out, dB_out, dX, predictions = self.calculate_gradients(X, Y_true, passPredictions=True)
         self.update_parameters(dW_1, dB_1, dW_out, dB_out, self.learning_rate)
-        if passPredictions: return predictions
+        if passPredictions:
+            return predictions, dX
+        return dX
 
 
     def train(self, X_train, Y_train, epochs, batch_size=256, shuffle=True, embedding_layer=None):
@@ -139,7 +142,9 @@ class Backprop:
                 Y_batch = Y_epoch[start:end]
                 if embedding_layer is not None:
                     X_batch = embedding_layer(X_batch)
-                predictions = self.training_step(X_batch, Y_batch, passPredictions=True)
+                predictions, embedding_gradients = self.training_step(X_batch, Y_batch, passPredictions=True)
+                if embedding_layer is not None:
+                    embedding_layer.update_parameters(X_epoch[start:end], embedding_gradients, self.learning_rate)
                 epoch_losses.append(-np.mean(Y_batch * np.log(predictions + 1e-18)))
 
             loss = np.mean(epoch_losses)
