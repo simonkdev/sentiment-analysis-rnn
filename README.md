@@ -55,7 +55,7 @@ This project implements sentiment analysis on the **IMDB movie review dataset** 
 - **Out-of-Vocabulary**: Tokens not in vocabulary are skipped
 
 ### Training Details
-- **Optimizer**: Custom SGD with gradient clipping
+- **Optimizer**: Custom BPTT with gradient clipping
 - **Learning Rate**: 0.0006
 - **Batch Size**: 256
 - **Loss Function**: Categorical cross-entropy
