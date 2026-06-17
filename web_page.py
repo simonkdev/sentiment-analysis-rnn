@@ -324,7 +324,7 @@ INDEX_HTML = """<!DOCTYPE html>
             </aside>
         </section>
 
-        <footer>Built for learning: Flask API, NumPy model, IMDB sentiment labels.</footer>
+        <footer>Built for learning: Flask API, NumPy model, IMDB sentiment labels. Source code: <a https://github.com/simonkdev/sentiment-analysis-rnn></a> </footer>
     </main>
 
     <script>
