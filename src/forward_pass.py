@@ -71,14 +71,14 @@ def forward_pass_one_layer_hidden(X_n, W_n, B, output_layer=False, passActivatio
 def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     """
     Vectorized forward pass for a batch of sequences.
-    X: [batch_size, seq_len] array of token indices (padded)
-    W_1: [neurons_hidden, 2] weight matrix for hidden layer
+    X: [batch_size, seq_len, input_features] array of embedded tokens
+    W_1: [neurons_hidden, input_features + neurons_hidden] weight matrix for hidden layer
     W_out: [output_neurons, neurons_hidden] weight matrix for output layer
     B_1: [neurons_hidden, 1] bias for hidden layer
     B_out: [output_neurons, 1] bias for output layer
     passActivations: whether to return intermediate activations
     """
-    batch_size, seq_len = X.shape
+    batch_size, seq_len, input_features = X.shape
     neurons_hidden = W_1.shape[0]
     output_neurons = W_out.shape[0]
 
@@ -88,14 +88,14 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
     # Pre-allocate arrays for intermediate values
     all_Z_1 = np.zeros((batch_size, seq_len, neurons_hidden))
     all_A_1 = np.zeros((batch_size, seq_len, neurons_hidden))
-    all_x_h = np.zeros((batch_size, seq_len, 1 + neurons_hidden))
+    all_x_h = np.zeros((batch_size, seq_len, input_features + neurons_hidden))
 
     # Process each time step
     for t in range(seq_len):
-        # Current token for all sequences: [batch_size, 1]
-        x_t = X[:, t].reshape(-1, 1)
+        # Current token embedding for all sequences: [batch_size, input_features]
+        x_t = X[:, t, :]
 
-        # Concatenate with previous hidden state: [batch_size, 1 + neurons_hidden]
+        # Concatenate with previous hidden state: [batch_size, input_features + neurons_hidden]
         x_h = np.concatenate([x_t, h_prev], axis=1)
         all_x_h[:, t, :] = x_h
 
@@ -120,10 +120,10 @@ def forward_pass_input_vector(X, W_1, W_out, B_1, B_out, passActivations=False):
 def forward_pass_one_input(X, W_1, W_out, B_1, B_out, passActivations=False):
     """
     Vectorized forward pass for a single sequence.
-    X: [seq_len] array of token indices
+    X: [seq_len, input_features] array of embedded tokens
     """
     # Reshape to batch of size 1 and use the batch version
-    X_batch = X.reshape(1, -1)
+    X_batch = X.reshape(1, X.shape[0], X.shape[1])
     result = forward_pass_input_vector(X_batch, W_1, W_out, B_1, B_out, passActivations)
 
     if passActivations:

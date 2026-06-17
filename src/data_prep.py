@@ -5,7 +5,7 @@ from pathlib import Path
 
 max_len = 150
 DEFAULT_TOKENIZER_PATH = Path(__file__).resolve().parent.parent / "params" / "tokenizer.json"
-
+DEFAULT_EMBEDDING_PATH = Path(__file__).resolve().parent.parent / "params" / "embedding_matrix.npy"
 
 class SimpleTokenizer:
     def __init__(self, word_index=None, filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n', lower=True, split=" "):
@@ -44,6 +44,41 @@ class SimpleTokenizer:
             text = text.lower()
         return [token for token in text.translate(self._translation).split(self.split) if token]
 
+    def save_state(self, path=DEFAULT_TOKENIZER_PATH):
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(
+                {
+                    "filters": self.filters,
+                    "lower": self.lower,
+                    "split": self.split,
+                    "word_index": self.word_index,
+                },
+                file,
+                separators=(",", ":"),
+            )
+
+class EmbeddingLayer:
+    def __init__(self, vocab_size=None, embedding_dim=50, embedding_matrix=None):
+        if embedding_matrix is not None:
+            self.embedding_matrix = embedding_matrix
+            self.vocab_size = embedding_matrix.shape[0] - 1
+            self.embedding_dim = embedding_matrix.shape[1]
+            return
+
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+        self.embedding_matrix = np.random.randn(vocab_size + 1, embedding_dim) * 0.01
+
+    def __call__(self, sequences):
+        embedded_sequences = np.zeros((len(sequences), max_len, self.embedding_dim))
+        for i, seq in enumerate(sequences):
+            for j, token in enumerate(seq):
+                if token != 0 and token < len(self.embedding_matrix):
+                    embedded_sequences[i, j] = self.embedding_matrix[token]
+        return embedded_sequences
+
+    def save_state(self, path=DEFAULT_EMBEDDING_PATH):
+        np.save(path, self.embedding_matrix)
 
 def load_tokenizer(path=DEFAULT_TOKENIZER_PATH):
     with open(path, encoding="utf-8") as file:
@@ -56,12 +91,20 @@ def load_tokenizer(path=DEFAULT_TOKENIZER_PATH):
         split=tokenizer_data.get("split", " "),
     )
 
+def load_embedding_layer(path=DEFAULT_EMBEDDING_PATH):
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Embedding matrix not found at {path}. Run `python train.py` to create params/embedding_matrix.npy."
+        )
+    embedding_matrix = np.load(path)
+    return EmbeddingLayer(embedding_matrix=embedding_matrix)
 
 def pad_sequences(sequences, maxlen, padding="pre", truncating="pre"):
-    padded_sequences = np.zeros((len(sequences), maxlen), dtype=float)
+    padded_sequences = np.zeros((len(sequences), maxlen), dtype=int)
 
     for index, sequence in enumerate(sequences):
-        truncated = np.asarray(sequence[:maxlen] if truncating == "post" else sequence[-maxlen:], dtype=float)
+        truncated = np.asarray(sequence[:maxlen] if truncating == "post" else sequence[-maxlen:], dtype=int)
         if padding == "post":
             padded_sequences[index, : len(truncated)] = truncated
         else:
@@ -78,26 +121,28 @@ def data_tokenization(dataframe):
     sequences = tokenizer.texts_to_sequences([row["text"] for row in dataframe])
 
     max_token = max(max(seq) for seq in sequences if seq) if sequences else 1
-    sequences = [[token / max_token for token in sequence] for sequence in sequences]
+    vocab_size = max_token
+    embedding_layer = EmbeddingLayer(vocab_size)
 
     sequences = pad_sequences(sequences, maxlen=max_len)
-    
-    return sequences, max_token, tokenizer
+
+    return sequences, max_token, tokenizer, embedding_layer
 
 def load_data(file_path):
     print(f"[ INIT ] Loading data from {file_path}...")
     with open(file_path, newline="", encoding="utf-8") as file:
         dataframe = list(csv.DictReader(file))
 
-    sequences, max_token, tokenizer = data_tokenization(dataframe)
+    sequences, max_token, tokenizer, embedding_layer = data_tokenization(dataframe)
     label_index = {"negative": 0, "positive": 1}
     labels = np.array(
         [[1 if index == label_index[row["label"]] else 0 for index in range(len(label_index))] for row in dataframe]
     )
     print(f"[ INIT ] Data loaded from {file_path}.")
-    return sequences[5000:], labels[5000:], max_token, tokenizer, sequences[:5000], labels[:5000:]
+    return sequences[5000:], labels[5000:], max_token, tokenizer, sequences[:5000], labels[:5000:], embedding_layer
 
-def process_new_data(string, max_token, tokenizer):
+def process_new_data(string, max_token, tokenizer, embedding_layer):
     sequence = tokenizer.texts_to_sequences([string])[0]
-    sequence = [token / max_token for token in sequence]
-    return pad_sequences([sequence], maxlen=max_len)[0]
+    sequence = pad_sequences([sequence], maxlen=max_len)[0]
+    embedded = embedding_layer([sequence])
+    return embedded[0]

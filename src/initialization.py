@@ -1,6 +1,6 @@
 import numpy as np
 
-def initialize_weights(neurons_hidden, output_neurons):
+def initialize_weights(neurons_hidden, output_neurons, input_features=1):
     """
     Initializes the weights for the recurrent neural network. 
     The weights are initialized randomly from a normal distribution with mean 0 and std 1. 
@@ -11,7 +11,7 @@ def initialize_weights(neurons_hidden, output_neurons):
     """
     print("[ INIT ] Initializing weights...")
     # Xavier/Glorot initialization for tanh
-    input_dim = 1 + neurons_hidden
+    input_dim = input_features + neurons_hidden
     scale_w1 = np.sqrt(6.0 / (input_dim + neurons_hidden))
     scale_wout = np.sqrt(6.0 / (neurons_hidden + output_neurons))
     W_1 = np.random.normal(0, scale_w1, (neurons_hidden, input_dim))

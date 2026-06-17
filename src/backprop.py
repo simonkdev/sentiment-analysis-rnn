@@ -18,7 +18,7 @@ class Backprop:
 
     def calculate_gradients(self, X, Y_true, passPredictions=False):
         """
-        X: [batch_size, seq_len] array of token indices (padded)
+        X: [batch_size, seq_len, input_features] array of embedded tokens
         Y_true: [batch_size, output_neurons] one-hot encoded labels
         """
         predictions, all_Z_1, all_A_1, _, all_x_h = forward_pass_input_vector(
@@ -26,6 +26,7 @@ class Backprop:
         )
 
         batch_size, seq_len, neurons_hidden = all_Z_1.shape
+        input_features = X.shape[2]
         output_neurons = self.W_out.shape[0]
 
         # Output layer gradients
@@ -34,14 +35,14 @@ class Backprop:
         dB_out = delta.sum(axis=0, keepdims=True).T / batch_size  # [output_neurons, 1]
 
         # Hidden layer gradients
-        dW_1 = np.zeros_like(self.W_1)  # [neurons_hidden, 2]
+        dW_1 = np.zeros_like(self.W_1)
         dB_1 = np.zeros_like(self.B_1)  # [neurons_hidden, 1]
 
         # Initial hidden delta for all sequences
         delta_hidden = np.einsum('bi,ij->bj', delta, self.W_out) * tanh_derivative(all_A_1[:, -1, :])  # [batch_size, neurons_hidden]
 
         tanh_derivs = tanh_derivative(all_A_1)  # [batch_size, seq_len, neurons_hidden]
-        recurrent_weights = self.W_1[:, 1:]  # [neurons_hidden, neurons_hidden]
+        recurrent_weights = self.W_1[:, input_features:]
 
         # Process time steps in reverse
         for t in reversed(range(seq_len)):
@@ -119,7 +120,7 @@ class Backprop:
         if passPredictions: return predictions
 
 
-    def train(self, X_train, Y_train, epochs, batch_size=256, shuffle=True):
+    def train(self, X_train, Y_train, epochs, batch_size=256, shuffle=True, embedding_layer=None):
         loss_history = []
         progress = tqdm.tqdm(range(epochs), desc="Training") if tqdm else range(epochs)
         for epoch in progress:
@@ -136,6 +137,8 @@ class Backprop:
                 end = start + batch_size
                 X_batch = X_epoch[start:end]
                 Y_batch = Y_epoch[start:end]
+                if embedding_layer is not None:
+                    X_batch = embedding_layer(X_batch)
                 predictions = self.training_step(X_batch, Y_batch, passPredictions=True)
                 epoch_losses.append(-np.mean(Y_batch * np.log(predictions + 1e-18)))
 
