@@ -82,6 +82,7 @@ class RNN:
         correct_count = np.sum(pred_classes == true_classes)
         accuracy = correct_count / len(self.test_seq) * 100
         print(f"ACCURACY IS APPROXIMATELY {accuracy}%")
+        return accuracy
 
 
 
