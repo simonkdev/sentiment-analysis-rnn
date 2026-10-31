@@ -28,7 +28,7 @@ This project implements sentiment analysis on the **IMDB movie review dataset** 
 | Component | Details |
 |-----------|---------|
 | **Input Layer** | Token embeddings (50 dimensions) |
-| **Hidden Layer** | 8 LSTM-like neurons with tanh activation |
+| **Hidden Layer** | 8 Standard RNN neurons with tanh activation |
 | **Output Layer** | 2 neurons (positive/negative) with softmax activation |
 | **Sequence Length** | 150 tokens (padded/truncated) |
 
