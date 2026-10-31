@@ -1,6 +1,6 @@
 # Sentiment Analysis with RNN
 
-A **Recurrent Neural Network** implementation for **sentiment analysis** of IMDB movie reviews. This project classifies text as positive or negative using a custom RNN implementation.
+A **Recurrent Neural Network** implementation for **sentiment analysis** of IMDB movie reviews. This project classifies text as positive or negative using a custom RNN implementation. Achieved an accuracy of 83% on the test set.
 
 ---
 
